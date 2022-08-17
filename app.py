@@ -1,25 +1,29 @@
 from flask import Flask,request
 from flask import render_template
 import os
-import pickle
-from bs4 import BeautifulSoup
 import pandas as pd
 from numpy.testing import assert_almost_equal
 import numpy as np
-import base64
 
 app = Flask(__name__)
 cart_id_1=[]
-embeds=pd.read_csv('C:/Users/Convergytics/Desktop/H and M/HM Personal_Laptop/similarities.csv')
+#embeds=pd.read_csv('static/data/similarities.csv')
+df=pd.read_csv('static/data/1_sim.csv')
+for i in range(2,6):
+    df1=pd.read_csv('static/data/{}_sim.csv'.format(i))
+    final=pd.concat([df,df1],axis=0)
+    df=final
+    print(df.shape)
+embeds=df
 embeds=embeds.set_index('path')
-images=pd.read_csv('C:/Users/Convergytics/Desktop/H and M/HM Personal_Laptop/img_pres.csv')
+images=pd.read_csv('static/data/img_pres.csv')
 images=images.drop('Unnamed: 0',axis=1)
 images.rename(columns={'0':'img_id'},inplace=True)
 images['ids']=images['img_id'].apply(lambda x:x[1:10])
 images['path']=images['img_id'].apply(lambda x: f"images/{x[0:3]}/{x}")
 ids=images['ids'][0:5000]
 ids=[int(x) for x in ids]
-articles=pd.read_csv('C:/Users/Convergytics/Desktop/H and M/HM Personal_Laptop/articles.csv')
+articles=pd.read_csv('static/data/articles.csv')
 articles=articles.loc[articles['article_id'].isin(ids)][['article_id','product_code', 'prod_name', 'product_type_no', 'product_type_name',
        'product_group_name', 'graphical_appearance_no',
        'graphical_appearance_name', 'colour_group_code', 'colour_group_name',
@@ -29,18 +33,25 @@ articles=articles.loc[articles['article_id'].isin(ids)][['article_id','product_c
        'index_group_no', 'index_group_name', 'section_no', 'section_name',
        'garment_group_no', 'garment_group_name', 'detail_desc']]
 print('waiting for transactions next')
-transactions=pd.read_csv('C:/Users/Convergytics/Desktop/H and M/HM Personal_Laptop/transactions_train.csv')
+#transactions=pd.read_csv('static/data/transactions_train.csv')
+df=pd.read_csv('static/data/1.csv')
+for i in range(2,39):
+    df1=pd.read_csv('static/data/{}.csv'.format(i))
+    final=pd.concat([df,df1],axis=0)
+    df=final
+    print(df.shape)
+transactions=df
 transactions=transactions.loc[transactions['article_id'].isin(ids)][[ 'customer_id', 'article_id', 'price']]
 print('transactions done')
 test_data = transactions.groupby(by="customer_id")['article_id'].agg(list).reset_index()
 print('test done')
 customers_final=test_data['customer_id']
 print('item_sim start')
-item_similarities = pd.read_csv('C:/Users/Convergytics/Desktop/H and M/HM Personal_Laptop/item_similarities.csv')
+item_similarities = pd.read_csv('static/data/item_similarities.csv')
 item_similarities.drop('Unnamed: 0',axis=1,inplace=True)
 print('import done')
 print('calling function')
-price_details=pd.read_csv('C:/Users/Convergytics/Desktop/H and M/HM Personal_Laptop/price_details.csv')
+price_details=pd.read_csv('static/data/price_details.csv')
 print('price details done')
 products=list(articles['product_type_name'].unique())
 print(products)

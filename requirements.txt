@@ -1,0 +1,5 @@
+pandas
+numpy
+os-sys
+flask
+gunicorn
