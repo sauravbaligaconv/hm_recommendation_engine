@@ -4,8 +4,10 @@
     {% if title %}
     <title> {{title}} </title>
     {% else %}
-    <title> Image Recommendations </title>
+    <title> H&M </title>
     {% endif %}  
+    <link rel = "icon" href = "static/site_imgs/Logo.png" 
+        type = "image/x-icon">
     <meta name="Recommender Gallery for TDS article">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {%if customstyle %}
