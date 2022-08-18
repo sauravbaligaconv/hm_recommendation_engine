@@ -54,7 +54,7 @@ print('calling function')
 price_details=pd.read_csv('static/data/price_details.csv')
 print('price details done')
 products=list(articles['product_type_name'].unique())
-print(products)
+print('home   :',products)
 item='shirt'
 path_store=[]
 price=[]
@@ -78,6 +78,7 @@ for i in products:
             price.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
             prod_name.append(pn[0])
             desc.append(d[0])
+print('shirts product name:',prod_name)
 #print('loading the images')
 #print(path_store[10])
 #images1=[]
@@ -242,7 +243,140 @@ def check_cart():
 
 @app.route('/shirts')
 def shirts():
-    return render_template('home.html', images = images1)
+    item1='shirt'
+    print(item1)
+    path_store_shirt=[]
+    price_shirt=[]
+    prod_name_shirt=[]
+    desc_shirt=[]
+    print('inside shirt:')
+    print(products)
+    for i in products:
+        print(i)
+        if str(item1) in i.lower().strip():
+            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+            trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+            trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            rows=2
+            for num, x in enumerate(trans_arts['article_id']):
+                a=str(x)
+                p=price_details[price_details['article_id']==int(a)]['price'].values
+                pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                path_store_shirt.append(path)
+                price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                prod_name_shirt.append(pn[0])
+                desc_shirt.append(d[0])
+    det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
+    print(prod_name_shirt)
+    return render_template('home.html', images = det_shirt)
+
+@app.route('/shorts')
+def shorts():
+    item1='shorts'
+    print(item1)
+    path_store_shirt=[]
+    price_shirt=[]
+    prod_name_shirt=[]
+    desc_shirt=[]
+    print('inside shirt:')
+    print(products)
+    for i in products:
+        print(i)
+        if str(item1) in i.lower().strip():
+            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+            trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+            trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            rows=2
+            for num, x in enumerate(trans_arts['article_id']):
+                a=str(x)
+                p=price_details[price_details['article_id']==int(a)]['price'].values
+                pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                path_store_shirt.append(path)
+                price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                prod_name_shirt.append(pn[0])
+                desc_shirt.append(d[0])
+    det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
+    print(prod_name_shirt)
+    return render_template('home.html', images = det_shirt)
+
+
+
+@app.route('/socks')
+def socks():
+    item1='socks'
+    print(item1)
+    path_store_shirt=[]
+    price_shirt=[]
+    prod_name_shirt=[]
+    desc_shirt=[]
+    print('inside shirt:')
+    print(products)
+    for i in products:
+        print(i)
+        if str(item1) in i.lower().strip():
+            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+            trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+            trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            rows=2
+            for num, x in enumerate(trans_arts['article_id']):
+                a=str(x)
+                p=price_details[price_details['article_id']==int(a)]['price'].values
+                pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                path_store_shirt.append(path)
+                price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                prod_name_shirt.append(pn[0])
+                desc_shirt.append(d[0])
+    det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
+    print(prod_name_shirt)
+    return render_template('home.html', images = det_shirt)
+
+@app.route('/watch')
+def watch():
+    item1='watch'
+    print(item1)
+    path_store_shirt=[]
+    price_shirt=[]
+    prod_name_shirt=[]
+    desc_shirt=[]
+    print('inside shirt:')
+    print(products)
+    for i in products:
+        print(i)
+        if str(item1) in i.lower().strip():
+            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+            trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+            trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            rows=2
+            for num, x in enumerate(trans_arts['article_id']):
+                a=str(x)
+                p=price_details[price_details['article_id']==int(a)]['price'].values
+                pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                path_store_shirt.append(path)
+                price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                prod_name_shirt.append(pn[0])
+                desc_shirt.append(d[0])
+    det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
+    print(prod_name_shirt)
+    return render_template('home.html', images = det_shirt)
+
+
+
 
 if __name__ == '__main__':
   app.run(debug=True)
