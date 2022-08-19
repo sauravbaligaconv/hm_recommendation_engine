@@ -35,7 +35,6 @@
     font-size: 36px;
     margin-left: 450px;
   }
- 
 
   @media screen and (max-height: 450px) {
     .sidenav {
@@ -77,18 +76,19 @@
  
   <div  id="mySidenav" class="sidenav">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="Menswear">Mens Selection</a>
-    <a href="Ladieswear">Ladies Selection</a>
-    <a href="Sport">Sports</a>
-    <a href="Baby_children">Baby-Children</a>
+    {{func}}
+
+    {% for i in catg %}
+    <a href="{{ url_for('%s'|format(func),selected_cat='')}}{{i}}">{{i}}</a>
+    {% endfor %}
   </div>
 
-  <span id="ham" style="font-size:30px;cursor:pointer;position:fixed;top:75px;" onclick="openNav()">&#9776;</span>
+  <span id="ham" style="font-size:30px;cursor:pointer;position:fixed;" onclick="openNav()">&#9776;</span>
 
 
 
 
-  <section style="margin-top:100px;" class="gallery">
+  <section class="gallery">
     <div class="galleryWrapper">
       <div class="container">
         <div class="row">
