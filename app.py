@@ -130,7 +130,8 @@ def getImages(inputImage):
 def home():
     #print(images)
     det=list(zip(path_store,price,prod_name,desc))
-    return render_template('home.html', images = det)
+    catg=['Mens','Ladies','Sports','Children']
+    return render_template('home.html', images = det,catg=catg)
 @app.route("/recommend")
 # Need to write a function that is called when opening recommendations
 def recommend():
@@ -244,68 +245,116 @@ def check_cart():
 @app.route('/Menswear')
 def menswear():
     item1='menswear'
+    selectedcat = request.args.get('selected_cat')
     print(item1)
+    print(selectedcat)
     path_store_shirt=[]
     price_shirt=[]
     prod_name_shirt=[]
     desc_shirt=[]
     print('inside shirt:')
     mens=articles.index_group_name.unique()
+    mens_sections=articles[articles.index_group_name=='Menswear'].section_name.unique()
     for i in mens:
-        print(i)
-        if str(item1) in i.lower().strip():
-            articles_list=articles[articles['index_group_name']==i]['article_id'].to_list()
-            trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
-            trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
-            trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
-            trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
-            rows=2
-            for num, x in enumerate(trans_arts['article_id']):
-                a=str(x)
-                p=price_details[price_details['article_id']==int(a)]['price'].values
-                pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
-                d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
-                path=f"/static/images/0{a[0:2]}/0{a}.jpg"
-                path_store_shirt.append(path)
-                price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
-                prod_name_shirt.append(pn[0])
-                desc_shirt.append(d[0])
+        if selectedcat==None:
+            print('entered none condition')
+            if str(item1) in i.lower().strip():
+                articles_list=articles[(articles['index_group_name']==i)]['article_id'].to_list()
+                trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+                trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+                trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+                trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
+                rows=2
+                for num, x in enumerate(trans_arts['article_id']):
+                    a=str(x)
+                    p=price_details[price_details['article_id']==int(a)]['price'].values
+                    pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                    d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                    path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                    path_store_shirt.append(path)
+                    price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                    prod_name_shirt.append(pn[0])
+                    desc_shirt.append(d[0])
+        else:
+            print('entered the change condition')
+            if str(item1) in i.lower().strip():
+                articles_list=articles[(articles['index_group_name']==i)&(articles['section_name']==selectedcat)]['article_id'].to_list()
+                trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+                trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+                trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+                trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
+                rows=2
+                for num, x in enumerate(trans_arts['article_id']):
+                    a=str(x)
+                    p=price_details[price_details['article_id']==int(a)]['price'].values
+                    pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                    d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                    path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                    path_store_shirt.append(path)
+                    price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                    prod_name_shirt.append(pn[0])
+                    desc_shirt.append(d[0])
+                
     det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
     print(prod_name_shirt)
-    return render_template('home.html', images = det_shirt)
+    return render_template('home1.html', images = det_shirt,catg=mens_sections,func='menswear')
 
 @app.route('/Ladieswear')
 def Ladieswear():
     item1='ladieswear'
+    selectedcat = request.args.get('selected_cat')
     print(item1)
+    print(selectedcat)
     path_store_shirt=[]
     price_shirt=[]
     prod_name_shirt=[]
     desc_shirt=[]
     print('inside shirt:')
-    ladies=articles.index_group_name.unique()
-    for i in ladies:
-        print(i)
-        if str(item1) in i.lower().strip():
-            articles_list=articles[articles['index_group_name']==i]['article_id'].to_list()
-            trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
-            trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
-            trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
-            trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
-            rows=2
-            for num, x in enumerate(trans_arts['article_id']):
-                a=str(x)
-                p=price_details[price_details['article_id']==int(a)]['price'].values
-                pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
-                d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
-                path=f"/static/images/0{a[0:2]}/0{a}.jpg"
-                path_store_shirt.append(path)
-                price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
-                prod_name_shirt.append(pn[0])
-                desc_shirt.append(d[0])
+    mens=articles.index_group_name.unique()
+    mens_sections=articles[articles.index_group_name=='Ladieswear'].section_name.unique()
+    for i in mens:
+        if selectedcat==None:
+            print('entered none condition')
+            if str(item1) in i.lower().strip():
+                articles_list=articles[(articles['index_group_name']==i)]['article_id'].to_list()
+                trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+                trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+                trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+                trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
+                rows=2
+                for num, x in enumerate(trans_arts['article_id']):
+                    a=str(x)
+                    p=price_details[price_details['article_id']==int(a)]['price'].values
+                    pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                    d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                    path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                    path_store_shirt.append(path)
+                    price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                    prod_name_shirt.append(pn[0])
+                    desc_shirt.append(d[0])
+        else:
+            print('entered the change condition')
+            if str(item1) in i.lower().strip():
+                articles_list=articles[(articles['index_group_name']==i)&(articles['section_name']==selectedcat)]['article_id'].to_list()
+                trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+                trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
+                trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
+                trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
+                rows=2
+                for num, x in enumerate(trans_arts['article_id']):
+                    a=str(x)
+                    p=price_details[price_details['article_id']==int(a)]['price'].values
+                    pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                    d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                    path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                    path_store_shirt.append(path)
+                    price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                    prod_name_shirt.append(pn[0])
+                    desc_shirt.append(d[0])
+                
     det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
     print(prod_name_shirt)
-    return render_template('home.html', images = det_shirt)
+    return render_template('home1.html', images = det_shirt,catg=mens_sections,func='Ladieswear')
 
 
 
