@@ -241,24 +241,24 @@ def check_cart():
     return render_template('cart.html',ab=cart_details_final,total_price=sum(price_cart))
 
 
-@app.route('/shirts')
-def shirts():
-    item1='shirt'
+@app.route('/Menswear')
+def menswear():
+    item1='menswear'
     print(item1)
     path_store_shirt=[]
     price_shirt=[]
     prod_name_shirt=[]
     desc_shirt=[]
     print('inside shirt:')
-    print(products)
-    for i in products:
+    mens=articles.index_group_name.unique()
+    for i in mens:
         print(i)
         if str(item1) in i.lower().strip():
-            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            articles_list=articles[articles['index_group_name']==i]['article_id'].to_list()
             trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
             trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
             trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
-            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
             rows=2
             for num, x in enumerate(trans_arts['article_id']):
                 a=str(x)
@@ -274,24 +274,24 @@ def shirts():
     print(prod_name_shirt)
     return render_template('home.html', images = det_shirt)
 
-@app.route('/shorts')
-def shorts():
-    item1='shorts'
+@app.route('/Ladieswear')
+def Ladieswear():
+    item1='ladieswear'
     print(item1)
     path_store_shirt=[]
     price_shirt=[]
     prod_name_shirt=[]
     desc_shirt=[]
     print('inside shirt:')
-    print(products)
-    for i in products:
+    ladies=articles.index_group_name.unique()
+    for i in ladies:
         print(i)
         if str(item1) in i.lower().strip():
-            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            articles_list=articles[articles['index_group_name']==i]['article_id'].to_list()
             trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
             trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
             trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
-            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
             rows=2
             for num, x in enumerate(trans_arts['article_id']):
                 a=str(x)
@@ -309,9 +309,9 @@ def shorts():
 
 
 
-@app.route('/socks')
-def socks():
-    item1='socks'
+@app.route('/Sport')
+def Sport():
+    item1='sport'
     print(item1)
     path_store_shirt=[]
     price_shirt=[]
@@ -319,14 +319,15 @@ def socks():
     desc_shirt=[]
     print('inside shirt:')
     print(products)
-    for i in products:
+    sporty=articles.index_group_name.unique()
+    for i in sporty:
         print(i)
         if str(item1) in i.lower().strip():
-            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            articles_list=articles[articles['index_group_name']==i]['article_id'].to_list()
             trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
             trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
             trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
-            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
             rows=2
             for num, x in enumerate(trans_arts['article_id']):
                 a=str(x)
@@ -342,9 +343,9 @@ def socks():
     print(prod_name_shirt)
     return render_template('home.html', images = det_shirt)
 
-@app.route('/watch')
-def watch():
-    item1='watch'
+@app.route('/Baby_children')
+def Baby_children():
+    item1='baby'
     print(item1)
     path_store_shirt=[]
     price_shirt=[]
@@ -352,14 +353,15 @@ def watch():
     desc_shirt=[]
     print('inside shirt:')
     print(products)
-    for i in products:
+    babies=articles.index_group_name.unique()
+    for i in babies:
         print(i)
         if str(item1) in i.lower().strip():
-            articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
+            articles_list=articles[articles['index_group_name']==i]['article_id'].to_list()
             trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
             trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
             trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
-            trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+            trans_arts=trans_arts.sort_values('counts',ascending=False).head(24)
             rows=2
             for num, x in enumerate(trans_arts['article_id']):
                 a=str(x)
