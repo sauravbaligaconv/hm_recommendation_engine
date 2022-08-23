@@ -19,8 +19,10 @@
 <body>
     <section style="z-index: 1;" class="header">
         <div class="headerImage">
-            <a href="/"><img src="{{url_for('static', filename='site_imgs/Logo.png')}}" alt="mds Logo"></a>
+            <a href="/home"><img src="{{url_for('static', filename='site_imgs/Logo.png')}}" alt="mds Logo"></a>
             <a href="/cart"><img src="{{url_for('static', filename='site_imgs/Logo1.png')}}" alt="mds Logo"></a>
+            <a class="btn btn-light float-end m-4"  href="logout">Logout</a>
+            
         </div>
     </section>
     {% block content %} {% endblock %}

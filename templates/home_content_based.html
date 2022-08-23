@@ -96,7 +96,7 @@
           {% for details in images %}
           <div class="col-sm mb-4">
             <div class="card" style="width: 18rem;">
-              <a href="{{ url_for('recommend', selectedImage='') }}{{details[0]}}">
+              <a href="{{ url_for('recommend_personalised', selectedImage='') }}{{details[0]}}">
                 <img class="card-img-top" src="{{details[0]}}" alt="Card image cap"></a>
               <div class="card-body">
                 <h5 class="card-title">{{details[2]}}</h5>
