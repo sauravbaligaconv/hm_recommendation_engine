@@ -1,8 +1,10 @@
 <a href="https://colorlib.com/wp/templates/"><img src="https://colorlib.com/wp/wp-content/uploads/sites/2/colorlib-push-logo.png" alt="Colorlib logo"></a>
 <h1 style="text-align:center;">Thank you for using our template!</h1>
 <p style="text-align:center;">For more awesome templates please visit <strong><a href="https://colorlib.com/wp/templates/">Colorlib</a></strong>.</p>
-<h1>{{time_global}}</h1>
-<h1>{{clicked}}</h1>
+{% for i in time_global %}
+<a href="{{ url_for('recommend_personalised', selectedImage='') }}{{i}}"><img src="static/{{i}}"></a>
+{% endfor %}
+
 <style>
 img {
   margin: 0 auto;
