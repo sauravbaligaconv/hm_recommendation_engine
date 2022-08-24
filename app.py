@@ -1,4 +1,4 @@
-from flask import Flask,request
+from flask import Flask,request,redirect,url_for
 from flask import render_template
 import pandas as pd
 from numpy.testing import assert_almost_equal
@@ -9,6 +9,8 @@ app = Flask(__name__)
 cart_id_1=[]
 time_global=[]
 clicked=[]
+cust_id_logged_in=[]
+added_to_cart_and_removed=[]
 #embeds=pd.read_csv('static/data/similarities.csv')
 df=pd.read_csv('static/data/1_sim.csv')
 for i in range(2,6):
@@ -46,6 +48,7 @@ for i in range(2,39):
     df=final
     print(df.shape)
 transactions=df
+unique_cust_id=transactions.customer_id.unique()
 test_data1=transactions.groupby(by="customer_id")['article_id'].agg(list).reset_index()
 transactions=transactions.loc[transactions['article_id'].isin(ids)][[ 'customer_id', 'article_id', 'price']]
 print('transactions done')
@@ -159,10 +162,17 @@ def getImages(inputImage):
     return 1
 
 
-@app.route("/")
+@app.route("/",methods=['GET', 'POST'])
 def login():
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        print(request.form['username'])
+        if request.form['username'] in unique_cust_id:
+            cust_id_logged_in.append(request.form['username'])
+            print('will be allowed to enter')
+            return redirect(url_for('home'))
     return render_template('index.html')
-@app.route("/home")
+    
+@app.route("/home",methods=['GET', 'POST'])
 # Need to write a function that is called when opening the site
 
 def home():
@@ -555,7 +565,8 @@ def Baby_children():
 @app.route('/Personalised_Reccomendation')
 def Personalised_Reccomendation():
     #login id should be fed here 
-    cust_id='01dc6b8b738036e5f1d8c5159ab0e09da8acb280aedd081f2295395e3880f65f'
+    cust_id=cust_id_logged_in[0]
+    print(cust_id)
     start=time.time()
     time_global.append(start)
     clicked.append('checking personalised')
@@ -701,6 +712,7 @@ def logout():
     print(time_global)
     print(clicked)
     session_time=time_global[-1]-time_global[0]
+    print('customer id is',cust_id_logged_in)
     print('session_time',session_time)
     timespent=[]
     for i in range(0,(len(time_global)-1)):
@@ -713,7 +725,69 @@ def logout():
     print(clicked)
     print(timespent)
     print(Session_info)
-    return render_template('main.html',time_global=timespent,clicked=clicked)
+    print(added_to_cart_and_removed)
+    clicked=[]
+    time_global=[]
+    return render_template('index.html')
+
+@app.route('/Your_Orders')
+def Your_Orders():
+    cust_id=cust_id_logged_in[0]
+    start=time.time()
+    time_global.append(start)
+    clicked.append('previous orders')
+    index_pos=test_data1[test_data1['customer_id']==cust_id].index.values
+    arts=test_data1.iloc[index_pos[0],1]
+    print(arts)
+    img_name=[]
+    price_previous=[]
+    product_name_previous=[]
+    for i in arts:
+        pd=price_details[price_details['article_id']==int(i)]['price'].values
+        price_previous.append(np.round(((np.round(pd[0]*100000)/10)*10)/10)*10)
+        pname=price_details[price_details['article_id']==int(i)]['prod_name'].values
+        product_name_previous.append(pname[0])
+        i=str(i)
+        path=f"/static/images/0{i[0:2]}/0{i}.jpg"
+        img_name.append(path)
+    print(sum(price_previous))
+    print(img_name)
+    cart_details_final=list(zip(product_name_previous,price_previous,img_name))
+    return render_template('cart.html',ab=cart_details_final,total_price=sum(price_previous))
+    #for a in arts:
+    #    art_index=article1[article1.article_id==a].index.values
+    #    products.append(article1.at[art_index[0],'product_type_name'])
+    #    items.append(a)
+    #return render_template('main.html',time_global=img_path)
+    
+@app.route('/remove_from_cart')
+def remove_from_cart():
+    start=time.time()
+    time_global.append(start)
+    clicked.append('removing from cart')
+    selectedImage = request.args.get('filename')
+    b=selectedImage[7:]
+    print(cart_id_1)
+    selectedImage1=int(selectedImage[-13:-4])
+    print(selectedImage1)
+    print(type(cart_id_1[1]))
+    added_to_cart_and_removed.append(selectedImage1)
+    cart_id_1.remove(str(selectedImage1))
+    img_name=[]
+    price_cart=[]
+    product_name_cart=[]
+    for i in cart_id_1:
+        pd=price_details[price_details['article_id']==int(i)]['price'].values
+        price_cart.append(np.round(((np.round(pd[0]*100000)/10)*10)/10)*10)
+        pname=price_details[price_details['article_id']==int(i)]['prod_name'].values
+        product_name_cart.append(pname[0])
+        path=f"/static/images/0{i[0:2]}/0{i}.jpg"
+        img_name.append(path)
+    print(sum(price_cart))
+    print(img_name)
+    print(added_to_cart_and_removed)
+    cart_details_final=list(zip(product_name_cart,price_cart,img_name))
+    return render_template('cart.html',ab=cart_details_final,total_price=sum(price_cart))
 
 
 if __name__ == '__main__':
