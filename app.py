@@ -5,6 +5,10 @@ from numpy.testing import assert_almost_equal
 import numpy as np
 from ast import literal_eval
 import time
+import win32com.client as client
+import pythoncom
+import os
+#import pathlib
 app = Flask(__name__)
 cart_id_1=[]
 time_global=[]
@@ -718,6 +722,7 @@ def logout():
     for i in range(0,(len(time_global)-1)):
         timespent.append(time_global[i+1]-time_global[i])
     timespent.append(0)
+    print(cust_id_logged_in)
     print(timespent)
     a={'activity':clicked,'Timespent':timespent}
     Session_info=pd.DataFrame(a)
@@ -726,8 +731,13 @@ def logout():
     print(timespent)
     print(Session_info)
     print(added_to_cart_and_removed)
-    clicked=[]
-    time_global=[]
+    if (len(added_to_cart_and_removed)>0):
+        send_mail()
+    time_global.clear()
+    clicked.clear()
+    added_to_cart_and_removed.clear()
+    cart_id_1.clear()
+    cust_id_logged_in.clear()
     return render_template('index.html')
 
 @app.route('/Your_Orders')
@@ -770,7 +780,6 @@ def remove_from_cart():
     print(cart_id_1)
     selectedImage1=int(selectedImage[-13:-4])
     print(selectedImage1)
-    print(type(cart_id_1[1]))
     added_to_cart_and_removed.append(selectedImage1)
     cart_id_1.remove(str(selectedImage1))
     img_name=[]
@@ -789,6 +798,56 @@ def remove_from_cart():
     cart_details_final=list(zip(product_name_cart,price_cart,img_name))
     return render_template('cart.html',ab=cart_details_final,total_price=sum(price_cart))
 
+def send_mail():
+    print(added_to_cart_and_removed)
+    path_store_mail=[]
+    prod_name_mail=[]
+    price_mail=[]
+    desc_mail=[]
+    for i in added_to_cart_and_removed:
+        a=str(i)
+        p=price_details[price_details['article_id']==int(a)]['price'].values
+        pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+        d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+        path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+        path_store_mail.append(path)
+        price_mail.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+        prod_name_mail.append(pn[0])
+        desc_mail.append(d[0])
+    path=os.path.join(os.getcwd(), 'static', 'images','0'+(str(added_to_cart_and_removed[0])[0:2]),'0'+str(added_to_cart_and_removed[0])+'.jpg')
+    print(path)
+#path=str(pathlib.Path(path1).absolute())
+#print(path)
+    pythoncom.CoInitialize()
+    outlook=client.Dispatch('Outlook.Application')
+    msg=outlook.CreateItem(0)
+    msg.Display()
+    msg.To='saurav.baliga@convergytics.com'
+    msg.Subject='DISCOUNT DISCOUNT DISCOUNT DISCOUNT'
+    image=msg.Attachments.Add(path)
+    html_body = """
+    <html>
+    <body>
+    <div>
+        <h1 style="font-family: 'Haderen Park'; font-size: 30; font-weight: bold; color: #052f63;"> Hi {},</h1>
+        <span style="font-family: 'Haderen Park'; font-size: 20; color: #073b7c;"> Discount Prices Slashed Use code FASHION and get 50% off</span>
+    </div><br>
+    <div>
+        <img src="cid:highlight-img" width='100'/>
+    </div>
+    <span style="font-family: 'Haderen Park'; font-size: 20; font-weight:bold; color: #052f63;">Regards<br/> H&M </span>
+    </body>
+    </html>
+    """
+
+# code for changing the content id of the image
+    image.PropertyAccessor.SetProperty("http://schemas.microsoft.com/mapi/proptag/0x3712001F", "highlight-img")
+    msg.HTMLBody=html_body.format(cust_id_logged_in)
+    msg.Display()
+    #msg.Send()
+
+
+
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  app.run(debug=True,use_reloader=False)
