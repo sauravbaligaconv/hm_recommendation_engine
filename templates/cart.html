@@ -96,7 +96,7 @@
         <td>{{i[0]}}</td>
         <td>₹ {{i[1]}}</td>
         <!--td><button class="btn btn-danger float-ed" onClick="removed_from_cart()">X</button></td-->
-        <td><a href="{{ url_for('remove_from_cart',filename='')}}{{i[2]}}" class="btn btn-danger">Add To Cart</a></td>
+        <td><a href="{{ url_for('remove_from_cart',filename='')}}{{i[2]}}" class="btn btn-danger">Remove</a></td>
         
       </tr>
       {% endfor %}
