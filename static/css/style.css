@@ -12,11 +12,11 @@ body{
 .header{
     width: 100%;
     height: 80px;
-    position: fixed;
-    top: 0;
-    left: 0;
+    /* position: fixed; */
+    /* top: 0;
+    left: 0; */
 	background: #355876;
-    z-index: 1;
+    /* z-index: 1; */
   }
 
 .header .headerImage img{
@@ -39,6 +39,7 @@ body{
     max-width:80%;
     float: center;
     margin:auto;
+    /* z-index: -1; */
 }
 
 .gallery .title h3{
