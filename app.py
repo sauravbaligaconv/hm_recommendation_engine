@@ -1,4 +1,4 @@
-from flask import Flask,request,redirect,url_for
+from flask import Flask,request,redirect,url_for,jsonify,make_response
 from flask import render_template
 import pandas as pd
 from numpy.testing import assert_almost_equal
@@ -822,7 +822,7 @@ def send_mail():
     outlook=client.Dispatch('Outlook.Application')
     msg=outlook.CreateItem(0)
     msg.Display()
-    msg.To='saurav.baliga@convergytics.com'
+    msg.To='sauravbaliga17@gmail.com'
     msg.Subject='DISCOUNT DISCOUNT DISCOUNT DISCOUNT'
     image=msg.Attachments.Add(path)
     html_body = """
@@ -844,10 +844,22 @@ def send_mail():
     image.PropertyAccessor.SetProperty("http://schemas.microsoft.com/mapi/proptag/0x3712001F", "highlight-img")
     msg.HTMLBody=html_body.format(cust_id_logged_in)
     msg.Display()
-    #msg.Send()
+    msg.Send()
 
 
+@app.route('/Lets_Get_To_Know_You',methods=['GET','POST'])
+def LGTKY():
+    return render_template('index_swipe.html')
 
+@app.route('/guestbook/create-entry',methods=['GET','POST'])
+def create_entry():
+        req=request.get_json()
+        print(req)
+        res=make_response(jsonify({'message':'JSON Recieved'}),200)
+        return jsonify({
+            'req':req
+        }
+        )
 
 if __name__ == '__main__':
   app.run(debug=True,use_reloader=False)
