@@ -8,6 +8,8 @@ import time
 import win32com.client as client
 import pythoncom
 import os
+import random
+import itertools
 #import pathlib
 app = Flask(__name__)
 cart_id_1=[]
@@ -15,6 +17,7 @@ time_global=[]
 clicked=[]
 cust_id_logged_in=[]
 added_to_cart_and_removed=[]
+swipe_details=[]
 #embeds=pd.read_csv('static/data/similarities.csv')
 df=pd.read_csv('static/data/1_sim.csv')
 for i in range(2,6):
@@ -849,17 +852,77 @@ def send_mail():
 
 @app.route('/Lets_Get_To_Know_You',methods=['GET','POST'])
 def LGTKY():
-    return render_template('index_swipe.html')
+    cust_id=cust_id_logged_in[0]
+    index_pos=test_data1[test_data1['customer_id']==cust_id].index.values
+    arts=test_data1.iloc[index_pos[0],1]
+    products_1=[]
+    items_1=[]
+    final_list=[]
+    for a in arts:
+        art_index=article1[article1.article_id==a].index.values
+        products_1.append(article1.at[art_index[0],'product_type_name'])
+        items_1.append(a)
+    unique_items=pd.DataFrame()
+    unique_items['products']=pd.Series(products_1)
+    unique_items['article_ids']=pd.Series(items_1)
+    unique_products=unique_items.groupby('products')['article_ids'].agg(list).reset_index()
+    for i,j in zip(unique_products['products'],unique_products['article_ids']):
+        arts_list=[]
+        for x in j:
+            #print(x)
+            arts_list.append(str(x))
+            final_list.append(arts_list[0])
+    print(final_list)
+    similar_list=[]
+    for ids in final_list[:]:
+        idd = str(ids)
+        print(idd)
+        similar_items = list(item_similarities1[item_similarities1['item']==int(idd)]['similar_items'])[0][1:]
+        print(similar_items)
+        similar_list.append(similar_items)
+    print(similar_list)
+    new_sim_list = itertools.chain(*similar_list)
+    new_sim_list=list(new_sim_list)
+    print(new_sim_list)
+    random_num = random.sample(new_sim_list,5)
+    print(random_num)
+    img_path_swipe=[]
+    for i,x in enumerate(random_num):
+        id = str(x)
+        path = f"/static/images/0{id[0:2]}/0{id}.jpg"
+        img_path_swipe.append(path)
+    price_r_item=[]
+    prod_name_r_item=[]
+    desc_r_item=[]
+    for i in random_num:
+        price_r=price_details[price_details['article_id']==int(i)]['price'].values
+        price_r_item.append(np.round(((np.round(price_r[0]*100000)/10)*10)/10)*10)
+        prod_name_r=price_details[price_details['article_id']==int(i)]['prod_name'].values
+        prod_name_r_item.append(prod_name_r[0])
+        desc_r=price_details[price_details['article_id']==int(i)]['detail_desc'].values
+        desc_r_item.append(desc_r[0])
+    print(price_r_item)
+    print(prod_name_r_item)
+    print(desc_r_item)
+    det_p_rec=list(zip(img_path_swipe,price_r_item,prod_name_r_item,desc_r_item))
+    print(det_p_rec)
+    return render_template('index_swipe_1.html',details=det_p_rec)
 
-@app.route('/guestbook/create-entry',methods=['GET','POST'])
+@app.route('/swiperesult',methods=['GET','POST'])
 def create_entry():
         req=request.get_json()
+        swipe_details.append(req)
         print(req)
+        print(swipe_details)
         res=make_response(jsonify({'message':'JSON Recieved'}),200)
         return jsonify({
             'req':req
         }
         )
+
+@app.route('/rec_swipe',methods=['GET','POST'])
+def rec_swipe():
+    return 'rec_swipe'
 
 if __name__ == '__main__':
   app.run(debug=True,use_reloader=False)
