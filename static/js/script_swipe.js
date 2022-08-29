@@ -102,7 +102,7 @@ love.addEventListener('click', loveListener);
 function myfunction(){
   $.ajax({
   type: "POST",
-  url: '/guestbook/create-entry',
+  url: '/swiperesult',
   data: JSON.stringify(a),
   contentType: "application/json",
   dataType: 'json' ,
