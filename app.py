@@ -18,6 +18,7 @@ clicked=[]
 cust_id_logged_in=[]
 added_to_cart_and_removed=[]
 swipe_details=[]
+images_for_swipe=[]
 #embeds=pd.read_csv('static/data/similarities.csv')
 df=pd.read_csv('static/data/1_sim.csv')
 for i in range(2,6):
@@ -70,7 +71,7 @@ print('calling function')
 price_details=pd.read_csv('static/data/price_details.csv')
 print('price details done')
 products=list(articles['product_type_name'].unique())
-print('home   :',products)
+#print('home   :',products)
 item='shirt'
 path_store=[]
 price=[]
@@ -568,6 +569,64 @@ def Baby_children():
     det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
     print(prod_name_shirt)
     return render_template('home1.html', images = det_shirt,catg=mens_sections,func='Baby_children')
+@app.route('/swipe_personalised')
+def swipe_personalised():
+    similar_list_swipe=[]
+    print('img from swipe',images_for_swipe)
+    print(swipe_details)
+    for i in range(len(swipe_details[0])):
+        if(swipe_details[0][i]>0):
+            swipe_details[0][i]='Right'
+        else:
+            swipe_details[0][i]='Left'
+    print(swipe_details[0])
+    print(cust_id_logged_in*5)
+    swipe_df=pd.DataFrame(columns=['customer_id','images','swipe'])
+    swipe_df['customer_id']=cust_id_logged_in*5
+    swipe_df['images']=images_for_swipe[0]
+    swipe_df['swipe']=swipe_details[0]
+    print(swipe_df)
+    right_swipes=swipe_df[swipe_df.swipe=='Right']
+    print(right_swipes)
+    print(right_swipes.images.values)
+    for ids in right_swipes.images.values:
+        idd = str(ids)
+        #print(idd)
+        similar_items_swipe = list(item_similarities1[item_similarities1['item']==int(idd)]['similar_items'])[0][1:]
+        #print(similar_items_swipe)
+        similar_list_swipe.append(similar_items_swipe)
+    #print(similar_list_swipe)
+    new_sim_list_swipe = itertools.chain(*similar_list_swipe)
+    new_sim_list_swipe=list(new_sim_list_swipe)
+    #print(new_sim_list_swipe)
+    img_path_swipe=[]
+    for i,x in enumerate(new_sim_list_swipe):
+            id = str(x)
+            path = f"/static/images/0{id[0:2]}/0{id}.jpg"
+            img_path_swipe.append(path)
+    price_r_item=[]
+    prod_name_r_item=[]
+    desc_r_item=[]
+    for i in new_sim_list_swipe:
+        #print(i)
+        price_r=price_details[price_details['article_id']==int(i)]['price'].values
+        if(len(price_r)==0):
+            continue
+        price_r_item.append(np.round(((np.round(price_r[0]*100000)/10)*10)/10)*10)
+        prod_name_r=price_details[price_details['article_id']==int(i)]['prod_name'].values
+        prod_name_r_item.append(prod_name_r[0])
+        desc_r=price_details[price_details['article_id']==int(i)]['detail_desc'].values
+        desc_r_item.append(desc_r[0])
+#print(price_r_item)
+#print(prod_name_r_item)
+#print(desc_r_item)
+    det_p_rec=list(zip(img_path_swipe,price_r_item,prod_name_r_item,desc_r_item))
+    #print(det_p_rec)
+    images_for_swipe.clear()
+    swipe_details.clear()
+    return render_template('home_content_based.html',images=det_p_rec)
+
+
 
 @app.route('/Personalised_Reccomendation')
 def Personalised_Reccomendation():
@@ -884,17 +943,18 @@ def LGTKY():
     new_sim_list = itertools.chain(*similar_list)
     new_sim_list=list(new_sim_list)
     print(new_sim_list)
-    random_num = random.sample(new_sim_list,5)
-    print(random_num)
+    images_random = random.sample(new_sim_list,5)
+    images_for_swipe.append(list(list(images_random)))
+    print(images_for_swipe)
     img_path_swipe=[]
-    for i,x in enumerate(random_num):
+    for i,x in enumerate(images_for_swipe[0]):
         id = str(x)
         path = f"/static/images/0{id[0:2]}/0{id}.jpg"
         img_path_swipe.append(path)
     price_r_item=[]
     prod_name_r_item=[]
     desc_r_item=[]
-    for i in random_num:
+    for i in images_for_swipe[0]:
         price_r=price_details[price_details['article_id']==int(i)]['price'].values
         price_r_item.append(np.round(((np.round(price_r[0]*100000)/10)*10)/10)*10)
         prod_name_r=price_details[price_details['article_id']==int(i)]['prod_name'].values
