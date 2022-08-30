@@ -108,7 +108,7 @@ function myfunction(){
   dataType: 'json' ,
   success: function(response) {
 	 console.log('my response',response)
-     window.location.replace('/home');
+     window.location.replace('/swipe_personalised');
 
     }
 });
