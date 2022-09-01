@@ -411,14 +411,20 @@ def Ladieswear():
                 rows=2
                 for num, x in enumerate(trans_arts['article_id']):
                     a=str(x)
-                    p=price_details[price_details['article_id']==int(a)]['price'].values
-                    pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
-                    d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
-                    path=f"/static/images/0{a[0:2]}/0{a}.jpg"
-                    path_store_shirt.append(path)
-                    price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
-                    prod_name_shirt.append(pn[0])
-                    desc_shirt.append(d[0])
+                    if(len(a)==0):
+                        continue
+                    else:
+                        print(a)
+                        p=price_details[price_details['article_id']==int(a)]['price'].values
+                        if(len(p)==0):
+                            continue
+                        pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                        d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                        path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                        path_store_shirt.append(path)
+                        price_shirt.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                        prod_name_shirt.append(pn[0])
+                        desc_shirt.append(d[0])
         else:
             print('entered the change condition')
             if str(item1) in i.lower().strip():
@@ -430,7 +436,11 @@ def Ladieswear():
                 rows=2
                 for num, x in enumerate(trans_arts['article_id']):
                     a=str(x)
+                    if(len(a)==0):
+                        continue
                     p=price_details[price_details['article_id']==int(a)]['price'].values
+                    if(len(p)==0):
+                        continue
                     pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
                     d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
                     path=f"/static/images/0{a[0:2]}/0{a}.jpg"
