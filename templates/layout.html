@@ -14,6 +14,7 @@
     <link rel="cusotm page stylesheet" href="{{ url_for('static', filename='css/') }}{{customstyle}}">
     {% endif %}
     <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}" >
+	<link rel="stylesheet" href="{{url_for('static',filename='css/style_autocomp.css')}}">
 </head>
 
 <body>
@@ -22,10 +23,21 @@
             <a href="/home"><img src="{{url_for('static', filename='site_imgs/Logo.png')}}" alt="mds Logo"></a>
             <a href="/cart"><img src="{{url_for('static', filename='site_imgs/Logo1.png')}}" alt="mds Logo"></a>
             <a class="btn btn-light float-end m-4"  href="logout">Logout</a>
-            
+            <div class="wrapper">
+				<div class="search-input">
+				<a href="" target="_blank" hidden></a>
+				<input type="text" placeholder="Type to search..">
+				<div class="autocom-box">
+				<!-- here list are inserted from javascript -->
+				</div>
+			<div class="icon"><i class="fas fa-search"></i></div>
+			</div>
+		</div>
         </div>
     </section>
     {% block content %} {% endblock %}
 </body>
-
+    <script src="{{url_for('static',filename='js/script_autocomp.js')}}"></script>
+    <script src="{{url_for('static',filename='js/suggestions_autocomp.js')}}"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </html> 
