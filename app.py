@@ -10,6 +10,7 @@ import pythoncom
 import os
 import random
 import itertools
+from itertools import chain
 #import pathlib
 app = Flask(__name__)
 cart_id_1=[]
@@ -19,6 +20,7 @@ cust_id_logged_in=[]
 added_to_cart_and_removed=[]
 swipe_details=[]
 images_for_swipe=[]
+search_details=[]
 #embeds=pd.read_csv('static/data/similarities.csv')
 df=pd.read_csv('static/data/1_sim.csv')
 for i in range(2,6):
@@ -70,7 +72,8 @@ print('import done')
 print('calling function')
 price_details=pd.read_csv('static/data/price_details.csv')
 print('price details done')
-products=list(articles['product_type_name'].unique())
+products=list(articles['product_type_name'].unique())   ###make changes here. bcz this is set on image based so only 5000 images
+products1=list(article1['product_type_name'].unique())
 #print('home   :',products)
 item='shirt'
 path_store=[]
@@ -979,6 +982,59 @@ def create_entry():
             'req':req
         }
         )
+
+@app.route('/search',methods=['GET','POST'])
+def create_search():
+        req=request.get_json()
+        search_details.append(req)
+        print(req)
+        print(search_details)
+        res=make_response(jsonify({'message':'JSON Recieved'}),200)
+        return jsonify({
+            'req':req
+        }
+        )
+        
+@app.route('/search_result',methods=['GET',"POST"])
+def search():
+    start=time.time()
+    time_global.append(start)
+    print(search_details)
+    item1=search_details[0]
+    path_store=[]
+    price=[]
+    prod_name=[]
+    desc=[]
+    print('item name',item1)
+    print(item1[0])
+    clicked.append(item1[0])
+    #item1=list(chain.from_iterable(item1))
+    #print('after flatten',item1)
+    print('products',products)
+    for i in products1:
+        if item1[0] in i.strip():
+            print('inside if loop',item1)
+            articles_list=article1[article1['product_type_name']==i]['article_id'].to_list()
+            trans_art1=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
+            trans_arts1=trans_art1.groupby('article_id')['customer_id'].agg(list).reset_index()
+            trans_arts1['counts']=trans_arts1['customer_id'].apply(lambda x: len(x))
+            trans_arts1=trans_arts1.sort_values('counts',ascending=False).head(10)
+            print(trans_arts1.head())
+            rows=2
+            for num, x in enumerate(trans_arts1['article_id']):
+                a=str(x)
+                p=price_details[price_details['article_id']==int(a)]['price'].values
+                pn=price_details[price_details['article_id']==int(a)]['prod_name'].values
+                d=price_details[price_details['article_id']==int(a)]['detail_desc'].values
+                path=f"/static/images/0{a[0:2]}/0{a}.jpg"
+                path_store.append(path)
+                price.append(np.round(((np.round(p[0]*100000)/10)*10)/10)*10)
+                prod_name.append(pn[0])
+                desc.append(d[0])
+    det=list(zip(path_store,price,prod_name,desc))
+    search_details.clear()
+    return render_template('home.html', images = det)
+
 
 @app.route('/rec_swipe',methods=['GET','POST'])
 def rec_swipe():
