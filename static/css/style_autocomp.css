@@ -17,8 +17,9 @@ body{
 }
 
 .wrapper{
-  max-width: 450px;
-  margin: 150px auto;
+  max-width: 250px;
+  margin: 0px;
+  margin-left:auto;
 }
 
 .wrapper .search-input{
