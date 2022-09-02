@@ -11,6 +11,8 @@ import os
 import random
 import itertools
 from itertools import chain
+import string
+import random
 #import pathlib
 app = Flask(__name__)
 cart_id_1=[]
@@ -21,6 +23,7 @@ added_to_cart_and_removed=[]
 swipe_details=[]
 images_for_swipe=[]
 search_details=[]
+scratch_card_coupon=[]
 #embeds=pd.read_csv('static/data/similarities.csv')
 df=pd.read_csv('static/data/1_sim.csv')
 for i in range(2,6):
@@ -1045,6 +1048,26 @@ def search():
     search_details.clear()
     return render_template('home.html', images = det)
 
+@app.route('/rewards',methods=['GET','POST'])
+def new_rewards():
+    res = ''.join(random.choices(string.ascii_uppercase +
+                             string.digits, k=6))
+    return render_template('scratch_card.html',code=str(res))
+
+@app.route('/rewards1',methods=['GET','POST'])
+def your_rewards():
+    return render_template('main.html',req=scratch_card_coupon)
+
+@app.route('/scratch_card',methods=['GET','POST'])
+def create_entry1():
+        req=request.get_json()
+        scratch_card_coupon.append(req)
+        print(req)
+        res=make_response(jsonify({'message':'JSON Recieved'}),200)
+        return jsonify({
+            'req':req
+        }
+        )
 
 @app.route('/rec_swipe',methods=['GET','POST'])
 def rec_swipe():
