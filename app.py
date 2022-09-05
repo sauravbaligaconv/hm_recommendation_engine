@@ -543,7 +543,7 @@ def Baby_children():
     mens_sections=articles[articles.index_group_name=='Baby/Children'].section_name.unique()
     for i in mens:
         if selectedcat==None:
-            clicked.append('Baby section')
+            #clicked.append('Baby section')
             print('entered none condition')
             if str(item1) in i.lower().strip():
                 articles_list=articles[(articles['index_group_name']==i)]['article_id'].to_list()
@@ -655,46 +655,53 @@ def Personalised_Reccomendation():
     img_path=[]
     index_pos=test_data1[test_data1['customer_id']==cust_id].index.values
     arts=test_data1.iloc[index_pos[0],1]
-    products=[]
-    items=[]
+    products_1=[]
+    items_1=[]
     for a in arts:
         art_index=article1[article1.article_id==a].index.values
-        products.append(article1.at[art_index[0],'product_type_name'])
-        items.append(a)
+        products_1.append(article1.at[art_index[0],'product_type_name'])
+        items_1.append(a)
     unique_items=pd.DataFrame()
-    unique_items['products']=pd.Series(products)
-    unique_items['article_ids']=pd.Series(items)
+    unique_items['products']=pd.Series(products_1)
+    unique_items['article_ids']=pd.Series(items_1)
     unique_products=unique_items.groupby('products')['article_ids'].agg(list).reset_index()
     final_list=[]
     for i,j in zip(unique_products['products'],unique_products['article_ids']):
         arts_list=[]
         for x in j:
             arts_list.append(str(x))
-        final_list.append(arts_list[0])
+            for i in arts_list:
+                final_list.append(i)
+    final_list=set(final_list)
+    similar_list=[]
     for ids in final_list:
         idd = str(ids)
         path = f"images/0{idd[0:2]}/0{idd}.jpg"
     #similar_items = list(item_similarities[item_similarities['item']==int(idd)]['similar_items'])[0]
-    similar_items=item_similarities1[item_similarities1['item']==int(idd)]['similar_items'].values[0]
-    print(similar_items)
-    
-    for i,x in enumerate(similar_items):
+        #similar_items=item_similarities1[item_similarities1['item']==int(idd)]['similar_items'].values[0]
+        similar_items = list(item_similarities1[item_similarities1['item']==int(idd)]['similar_items'])[0][1:]
+        similar_list.append(similar_items)
+    new_sim_list = itertools.chain(*similar_list)
+    new_sim_list=list(new_sim_list)
+    print(new_sim_list)
+    for i,x in enumerate(new_sim_list):
         id = str(x)
-        path = f"/static/images/0{id[0:2]}/0{id}.jpg"
+        path = f"static/images/0{id[0:2]}/0{id}.jpg"
         img_path.append(path)
+    #print(img_path)
     price_r_item=[]
     prod_name_r_item=[]
     desc_r_item=[]
-    for i in similar_items:
+    for i in new_sim_list:
         price_r=price_details[price_details['article_id']==int(i)]['price'].values
         price_r_item.append(np.round(((np.round(price_r[0]*100000)/10)*10)/10)*10)
         prod_name_r=price_details[price_details['article_id']==int(i)]['prod_name'].values
         prod_name_r_item.append(prod_name_r[0])
         desc_r=price_details[price_details['article_id']==int(i)]['detail_desc'].values
         desc_r_item.append(desc_r[0])
-    print(price_r_item)
+#print(price_r_item)
     print(prod_name_r_item)
-    print(desc_r_item)
+#print(desc_r_item)
     det_p_rec=list(zip(img_path,price_r_item,prod_name_r_item,desc_r_item))
     return render_template('home_content_based.html',images=det_p_rec)
 
@@ -720,7 +727,7 @@ def recommend_personalised():
     second_price_list=[]
     for i in first_random:
         a=str(i)
-        path=f"/images/0{a[0:2]}/0{a}.jpg"
+        path=f"images/0{a[0:2]}/0{a}.jpg"
         first.append(path)
         first_product=price_details[price_details['article_id']==i]['prod_name'].values
         first_product_list.append(first_product[0])
@@ -946,7 +953,9 @@ def LGTKY():
         for x in j:
             #print(x)
             arts_list.append(str(x))
-            final_list.append(arts_list[0])
+            for i in arts_list:
+                final_list.append(i)
+    final_list=list(set(final_list))
     print(final_list)
     similar_list=[]
     for ids in final_list[:]:
