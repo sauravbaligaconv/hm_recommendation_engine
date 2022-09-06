@@ -120,7 +120,19 @@
               </a> -->
         <!-- </div> -->
       </div>
-
+      <!--nav aria-label="Page navigation example">
+        <ul class="pagination">
+          {% if images.has_prev %}
+          <li class="page-item"><a class="page-link" href="{{ url_for('home', page=images.prev_num) }}">Previous</a></li>
+          {% endif %}
+          <li class="page-item"><a class="page-link" href="{{ url_for('home', page=pages) }}">{{pages}}</a></li>
+          <li class="page-item"><a class="page-link" href="{{ url_for('home', page=pages+1) }}">{{pages+1}}</a></li>
+          <li class="page-item"><a class="page-link" href="{{ url_for('home', page=pages+2) }}">{{pages+2}}</a></li>
+          {% if images.has_next %}
+          <li class="page-item"><a class="page-link" href="{{ url_for('home', page=images.next_num) }}">Next</a></li>
+          {% endif %}
+        </ul>
+      </nav-->
     </div>
   </section>
 
