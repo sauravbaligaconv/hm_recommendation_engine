@@ -13,6 +13,7 @@ import itertools
 from itertools import chain
 import string
 import random
+from flask_sqlalchemy import Pagination
 #import pathlib
 app = Flask(__name__)
 cart_id_1=[]
@@ -89,7 +90,7 @@ for i in products:
         trans_art=transactions[transactions['article_id'].isin(articles_list)][['customer_id','article_id','price']]
         trans_arts=trans_art.groupby('article_id')['customer_id'].agg(list).reset_index()
         trans_arts['counts']=trans_arts['customer_id'].apply(lambda x: len(x))
-        trans_arts=trans_arts.sort_values('counts',ascending=False).head(10)
+        trans_arts=trans_arts.sort_values('counts',ascending=False).head(200)
         rows=2
         for num, x in enumerate(trans_arts['article_id']):
             a=str(x)
@@ -197,8 +198,21 @@ def home():
         clicked.append('Home')
     else:
         clicked.append('Log In')
+    page=request.args.get('page',1,type=int)
     det=list(zip(path_store,price,prod_name,desc))
-    return render_template('home.html', images = det)
+    start = (page - 1) * 20
+    end = start + 20
+    items = det[start:end]
+    #print(items)
+    pagination = Pagination(None, page, 20, len(det), items)
+    #print(pagination)
+    print('items',pagination.items)
+    print('has prev',pagination.has_prev)
+    print('pages',pagination.pages)
+    print('iter_pages',pagination.iter_pages)
+    if(page>=pagination.pages):
+        page=1
+    return render_template('home.html', images = pagination,pages=page)
 @app.route("/recommend")
 # Need to write a function that is called when opening recommendations
 def recommend():
@@ -337,7 +351,7 @@ def menswear():
     prod_name_shirt=[]
     desc_shirt=[]
     print('inside shirt:')
-    mens=articles.index_group_name.unique()
+    mens=articles.index_group_name.unique()                    ###fault here it is selecting all categories not only men
     mens_sections=articles[articles.index_group_name=='Menswear'].section_name.unique()
     for i in mens:
         if selectedcat==None:
@@ -380,8 +394,17 @@ def menswear():
                     desc_shirt.append(d[0])
                 
     det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
-    print(prod_name_shirt)
-    return render_template('home1.html', images = det_shirt,catg=mens_sections,func='menswear')
+    page=request.args.get('page',1,type=int)
+    start = (page - 1) * 20
+    end = start + 20
+    items = det_shirt[start:end]
+    #print(items)
+    pagination = Pagination(None, page, 20, len(det_shirt), items)
+    #print(pagination)
+    print('pages',pagination.pages)
+    if(page>=pagination.pages):
+        page=1
+    return render_template('home1.html', images = det_shirt ,catg=mens_sections,func='menswear')
 
 @app.route('/Ladieswear')
 def Ladieswear():
@@ -702,8 +725,16 @@ def Personalised_Reccomendation():
 #print(price_r_item)
     print(prod_name_r_item)
 #print(desc_r_item)
+    page=request.args.get('page',1,type=int)
+    start = (page - 1) * 20
+    end = start + 20
+    #print(items)
     det_p_rec=list(zip(img_path,price_r_item,prod_name_r_item,desc_r_item))
-    return render_template('home_content_based.html',images=det_p_rec)
+    items = det_p_rec[start:end]
+    pagination = Pagination(None, page, 20, len(det_p_rec), items)
+    if(page>=pagination.pages):
+        page=1
+    return render_template('home_content_based.html',images=pagination,pages=page)
 
 @app.route('/Personalised')
 def recommend_personalised():
