@@ -11,11 +11,11 @@ var select_item=[];
 inputBox.onkeyup = (e)=>{
     let userData = e.target.value; //user enetered data
     let emptyArray = [];
+    console.log(userData)
     if(userData){
         icon.onclick = ()=>{
-            webLink = '/search/${userData}';
-            linkTag.setAttribute("href", webLink);
-            linkTag.click();
+            select_item.push(userData)
+            myfunction_ajax()
         }
         emptyArray = suggestions.filter((data)=>{
             //filtering array value and user characters to lowercase and return only those words which are start with user enetered chars
