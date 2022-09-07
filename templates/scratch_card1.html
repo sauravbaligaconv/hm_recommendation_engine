@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+<head>
+  <meta charset="UTF-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
+	</script>
+  <title>Scratch Card</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_scratch_card.css') }}">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!--
+https://github.com/andreruffert/scratchie.js
+-->
+<section style="margin-top:100px;" class="gallery">
+  <div class="galleryWrapper">
+    <div class="container">
+      <div class="row">
+        {% for i in req %}
+        <div class="col-sm mb-4">
+          <div class="card" style="width: 18rem;border:10px solid;border-color: red;">
+          <!--div class="container" id="js-container"-->
+            <form class="form" style="visibility: visible;">
+              <h2>'Allo, 'Allo!</h2>
+              <h3>The secret code is:</h3>
+              <h1><code id='code'>{{i}}</code></h1>
+              <br>
+            </form>  
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+<!-- partial -->
+  <script>
+	window.static_folder = "{{url_for('static',filename='site_imgs/Colors-of-the-HM-Logo.png')}}";
+  </script>
+  <script  src="{{ url_for('static', filename='js/script_scratch_Card.js') }}"></script>
+
+</body>
+{% endblock content %}
