@@ -667,10 +667,10 @@ def swipe_personalised():
 #print(prod_name_r_item)
 #print(desc_r_item)
     det_p_rec=list(zip(img_path_swipe,price_r_item,prod_name_r_item,desc_r_item))
-    #print(det_p_rec)
+    print(det_p_rec)
     images_for_swipe.clear()
     swipe_details.clear()
-    return render_template('home_content_based.html',images=det_p_rec)
+    return render_template('home_content_based_swipe.html',images=det_p_rec)
 
 
 
