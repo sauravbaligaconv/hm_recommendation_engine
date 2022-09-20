@@ -652,6 +652,8 @@ def swipe_personalised():
     swipe_df['customer_id']=cust_id_logged_in*5
     swipe_df['images']=images_for_swipe[0]
     swipe_df['swipe']=swipe_details[0]
+    images_for_swipe.clear()
+    swipe_details.clear()
     print(swipe_df)
     right_swipes=swipe_df[swipe_df.swipe=='Right']
     print(right_swipes)
