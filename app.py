@@ -16,18 +16,19 @@ import random
 from flask_sqlalchemy import Pagination
 from difflib import SequenceMatcher
 #import pathlib
-app = Flask(__name__)
-cart_id_1=[]
-time_global=[]
-clicked=[]
-cust_id_logged_in=[]
-added_to_cart_and_removed=[]
-swipe_details=[]
-images_for_swipe=[]
-search_details=[]
-scratch_card_coupon=[]
+app = Flask(__name__)  #Initializing the Flask Instance
+#Global Variables
+cart_id_1=[] #used to store articles added to cart
+time_global=[] #used to store time spent on a product or a category
+clicked=[] #used to store the item or category the user viewed
+cust_id_logged_in=[] #the logged in customer
+added_to_cart_and_removed=[] #the articles that where added to cart and then removed
+swipe_details=[] #Details whether the image was right swipped or left swipped
+images_for_swipe=[]  #Details of the 5 images that were present in the images in the swipe game 
+search_details=[] #Store the details of the products the customer searched
+scratch_card_coupon=[]  # code of the Scratch card coupon won by the customer
 #embeds=pd.read_csv('static/data/similarities.csv')
-df=pd.read_csv('static/data/1_sim.csv')
+df=pd.read_csv('static/data/1_sim.csv')  #Importing Image similarity data in chuncks of 1000
 for i in range(2,6):
     df1=pd.read_csv('static/data/{}_sim.csv'.format(i))
     final=pd.concat([df,df1],axis=0)
@@ -35,14 +36,14 @@ for i in range(2,6):
     print(df.shape)
 embeds=df
 embeds=embeds.set_index('path')
-images=pd.read_csv('static/data/img_pres.csv')
+images=pd.read_csv('static/data/img_pres.csv') # Image dataset
 images=images.drop('Unnamed: 0',axis=1)
 images.rename(columns={'0':'img_id'},inplace=True)
 images['ids']=images['img_id'].apply(lambda x:x[1:10])
 images['path']=images['img_id'].apply(lambda x: f"images/{x[0:3]}/{x}")
 ids=images['ids'][0:5000]
 ids=[int(x) for x in ids]
-item_similarities1=pd.read_csv('static/data/content_based_similar_items.csv',converters={'similar_items': literal_eval})
+item_similarities1=pd.read_csv('static/data/content_based_similar_items.csv',converters={'similar_items': literal_eval})#content based similarity data
 item_similarities1.drop('Unnamed: 0',axis=1,inplace=True)
 articles=pd.read_csv('static/data/articles.csv')
 article1=articles.copy()
@@ -56,7 +57,7 @@ articles=articles.loc[articles['article_id'].isin(ids)][['article_id','product_c
        'garment_group_no', 'garment_group_name', 'detail_desc']]
 print('waiting for transactions next')
 #transactions=pd.read_csv('static/data/transactions_train.csv')
-df=pd.read_csv('static/data/1.csv')
+df=pd.read_csv('static/data/1.csv') #importing transactions data in chunks
 for i in range(2,39):
     df1=pd.read_csv('static/data/{}.csv'.format(i))
     final=pd.concat([df,df1],axis=0)
@@ -81,10 +82,10 @@ products=list(articles['product_type_name'].unique())   ###make changes here. bc
 products1=list(article1['product_type_name'].unique())
 #print('home   :',products)
 item='shirt'
-path_store=[]
-price=[]
-prod_name=[]
-desc=[]
+path_store=[]  #used to store path of the image
+price=[]    #used to  store price of the image
+prod_name=[] #used to store product name
+desc=[] #used to store description
 for i in products:
     if str(item) in i.lower().strip():
         articles_list=articles[articles['product_type_name']==i]['article_id'].to_list()
@@ -111,6 +112,10 @@ for i in products:
 #       with open(file, "rb") as image:
 #            encoded = base64.b64encode(image.read()).decode()
 #            images1.append(f"data:image/jpeg;base64,{encoded}")
+
+
+
+#Retreive most similar images
 def retrieve_most_similar_products(idd):
     a=articles[articles['article_id']==idd].index.values.astype('int')
     #print('article purchased:',idd,articles.loc[a,'product_type_name'].item())
@@ -133,6 +138,7 @@ def retrieve_most_similar_products(idd):
         desc.append(d[0])
     return list(zip(closest_imgs,price,prod_name,desc)),input_product[0],np.round(((np.round(input_price[0]*100000)/10)*10)/10)*10,input_det[0]
 
+#Most Similar Personalised product
 def retrieve_most_similar_personalised_products(idd):
     a=article1[article1['article_id']==idd].index.values.astype('int')
     #print('article purchased:',idd,articles.loc[a,'product_type_name'].item())
@@ -177,7 +183,7 @@ def getNames(inputName, similarNames, similarValues):
 def getImages(inputImage):
     return 1
 
-
+#Login Page
 @app.route("/",methods=['GET', 'POST'])
 def login():
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
@@ -187,14 +193,16 @@ def login():
             print('will be allowed to enter')
             return redirect(url_for('home'))
     return render_template('index.html')
-    
+
+
+#home page
 @app.route("/home",methods=['GET', 'POST'])
 # Need to write a function that is called when opening the site
 
 def home():
     #print(images)
-    start=time.time()
-    time_global.append(start)
+    start=time.time()   #start time
+    time_global.append(start) 
     if('Log In' in clicked):
         clicked.append('Home')
     else:
@@ -214,8 +222,9 @@ def home():
     if(page>=pagination.pages):
         page=1
     return render_template('home.html', images = pagination,pages=page)
+
+#when an image is clicked on the home page this function gets triggered. we store the clicked detail and provide relevant recommendation
 @app.route("/recommend")
-# Need to write a function that is called when opening recommendations
 def recommend():
     start=time.time()
     time_global.append(start)
@@ -258,9 +267,11 @@ def recommend():
         second_det_list.append(second_det[0])
     details_second=list(zip(second,second_product_list,second_det_list,second_price_list))
     return render_template('recommend.html',input_image=b,details=details,input_product=input_product,input_price=input_price,input_det=input_det,details_first=details_first,details_second=details_second)
-    
+
+
+
+#Same as previous function but with the slight change in recording the clicks.To solve issues with selectedImage variables it is set as a different function 
 @app.route("/recommend1")
-# Need to write a function that is called when opening recommendations
 def recommend1():
     start=time.time()
     time_global.append(start)
@@ -305,15 +316,19 @@ def recommend1():
     details_second=list(zip(second,second_product_list,second_det_list,second_price_list))
     return render_template('recommend.html',input_image=selectedImage,details=details,input_product=input_product,input_price=input_price,input_det=input_det,details_first=details_first,details_second=details_second)
 
+
+#Add to cart
 @app.route('/quick_add')
 def quick_add():
     selectedImage = request.args.get('filename')
     id=selectedImage[-13:-4]
-    cart_id_1.append(id)
+    cart_id_1.append(id)  #product id added to cart_id_1 list
     print(cart_id_1)
     det=list(zip(path_store,price,prod_name,desc))
     return render_template('home.html',images=det)
 
+
+#Checking the cart 
 @app.route('/cart')
 def check_cart():
     start=time.time()
@@ -334,7 +349,7 @@ def check_cart():
     cart_details_final=list(zip(product_name_cart,price_cart,img_name))
     return render_template('cart.html',ab=cart_details_final,total_price=sum(price_cart))
 
-
+#Categorical product filtering. Here checking the category of Menswear
 @app.route('/Menswear')
 def menswear():
     item1='menswear'
@@ -352,7 +367,7 @@ def menswear():
     prod_name_shirt=[]
     desc_shirt=[]
     print('inside shirt:')
-    mens=articles.index_group_name.unique()                    ###fault here it is selecting all categories not only men
+    mens=articles.index_group_name.unique()                    
     mens_sections=articles[articles.index_group_name=='Menswear'].section_name.unique()
     print(mens)
     print(mens_sections)
@@ -405,8 +420,10 @@ def menswear():
     print('pages',pagination.pages)
     if(page>=pagination.pages):
         page=1
-    return render_template('home1.html', images = det_shirt ,catg=mens_sections,func='menswear')
+    return render_template('home1.html', images = det_shirt ,catg=mens_sections,func='menswear') 
 
+
+#Categorical product filtering. Here checking the category of Ladieswear
 @app.route('/Ladieswear')
 def Ladieswear():
     item1='ladieswear'
@@ -482,6 +499,7 @@ def Ladieswear():
 
 
 
+#Categorical product filtering. Here checking the category of sport
 @app.route('/Sport')
 def Sport():
     item1='sport'
@@ -554,7 +572,7 @@ def Sport():
     print(prod_name_shirt)
     return render_template('home1.html', images = det_shirt,catg=sport_sections,func='Sport')
 
-
+#Categorical product filtering. Here checking the category of baby children
 @app.route('/Baby_children')
 def Baby_children():
     item1='baby'
@@ -615,6 +633,9 @@ def Baby_children():
     det_shirt=list(zip(path_store_shirt,price_shirt,prod_name_shirt,desc_shirt))
     print(prod_name_shirt)
     return render_template('home1.html', images = det_shirt,catg=mens_sections,func='Baby_children')
+
+
+#Game of left and right swipe.Based on recommendation of previous purchases the customer is shown 5 cards which he can right and left swipe and based on the swipes he will get the recommendation    
 @app.route('/swipe_personalised')
 def swipe_personalised():
     similar_list_swipe=[]
@@ -673,7 +694,7 @@ def swipe_personalised():
     return render_template('home_content_based_swipe.html',images=det_p_rec)
 
 
-
+#Personalised Recommendation based on customers purchase history
 @app.route('/Personalised_Reccomendation')
 def Personalised_Reccomendation():
     #login id should be fed here 
@@ -743,6 +764,8 @@ def Personalised_Reccomendation():
         page=1
     return render_template('home_content_based.html',images=pagination,pages=page)
 
+
+#This function gets triggered when a image is clicked on the personalised recommendation page and based on that click 5 more similar products are recommended
 @app.route('/Personalised')
 def recommend_personalised():
     start=time.time()
@@ -787,6 +810,7 @@ def recommend_personalised():
     details_second=list(zip(second,second_product_list,second_det_list,second_price_list))
     return render_template('recommend_personalised.html',input_image=b,details=details,input_product=input_product,input_price=input_price,input_det=input_det,details_first=details_first,details_second=details_second)
 
+#same as previous.used to solve issues arising at selectedImage
 @app.route('/Personalised1')
 def recommend_personalised_1():
     start=time.time()
@@ -831,6 +855,7 @@ def recommend_personalised_1():
         second_det_list.append(second_det[0])
     details_second=list(zip(second,second_product_list,second_det_list,second_price_list))
     return render_template('recommend_personalised.html',input_image=selectedImage,details=details,input_product=input_product,input_price=input_price,input_det=input_det,details_first=details_first,details_second=details_second)
+#Logging Out    
 @app.route('/logout')
 def logout():
     start=time.time()
@@ -863,6 +888,8 @@ def logout():
     cust_id_logged_in.clear()
     return render_template('index.html')
 
+
+#Viewing customers previous orders 
 @app.route('/Your_Orders')
 def Your_Orders():
     cust_id=cust_id_logged_in[0]
@@ -893,6 +920,8 @@ def Your_Orders():
     #    items.append(a)
     #return render_template('main.html',time_global=img_path)
     
+
+#Delete From Cart. And this gets recorded in the added_to_cart_and_removed list    
 @app.route('/remove_from_cart')
 def remove_from_cart():
     start=time.time()
@@ -921,6 +950,8 @@ def remove_from_cart():
     cart_details_final=list(zip(product_name_cart,price_cart,img_name))
     return render_template('cart.html',ab=cart_details_final,total_price=sum(price_cart))
 
+
+#Trigger a mail to customer who added a product to the list and then removed it. 
 def send_mail():
     print(added_to_cart_and_removed)
     path_store_mail=[]
@@ -970,6 +1001,8 @@ def send_mail():
     msg.Send()
 
 
+
+#Right Left Swipe Game
 @app.route('/Lets_Get_To_Know_You',methods=['GET','POST'])
 def LGTKY():
     cust_id=cust_id_logged_in[0]
@@ -1031,6 +1064,7 @@ def LGTKY():
     print(det_p_rec)
     return render_template('index_swipe_1.html',details=det_p_rec)
 
+#Store the swipe details from the front end using ajax method.
 @app.route('/swiperesult',methods=['GET','POST'])
 def create_entry():
         req=request.get_json()
@@ -1042,7 +1076,7 @@ def create_entry():
             'req':req
         }
         )
-
+#Search for a product.(ajax method)
 @app.route('/search',methods=['GET','POST'])
 def create_search():
         req=request.get_json()
@@ -1054,7 +1088,8 @@ def create_search():
             'req':req
         }
         )
-        
+
+#Search Result     
 @app.route('/search_result',methods=['GET',"POST"])
 def search():
     start=time.time()
@@ -1102,6 +1137,7 @@ def search():
     search_details.clear()
     return render_template('home.html', images = det)
 
+
 @app.route('/rewards',methods=['GET','POST'])
 def new_rewards():
     res = ''.join(random.choices(string.ascii_uppercase +
@@ -1113,6 +1149,8 @@ def your_rewards():
     a=scratch_card_coupon
     return render_template('scratch_card1.html',req=a)
 
+
+#Scratch Card
 @app.route('/scratch_card',methods=['GET','POST'])
 def create_entry1():
         req=request.get_json()
@@ -1123,10 +1161,6 @@ def create_entry1():
             'req':req
         }
         )
-
-@app.route('/rec_swipe',methods=['GET','POST'])
-def rec_swipe():
-    return 'rec_swipe'
 
 if __name__ == '__main__':
   app.run(debug=True,use_reloader=False)
