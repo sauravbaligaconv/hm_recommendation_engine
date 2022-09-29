@@ -194,7 +194,24 @@ def login():
             return redirect(url_for('home'))
     return render_template('index.html')
 
-
+@app.route('/signup',methods=['GET','POST'])
+def signup():
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
+        print(request.form['username'])
+        print(request.form['password'])
+        print(request.form['password1'])
+        if request.form['username'] in unique_cust_id:
+            msg='account already exists'
+            return render_template('signup.html',msg=msg)
+        elif(request.form['password']!=request.form['password1']):
+            msg='password doesnot match'
+            print(msg)
+            return render_template('signup.html',msg=msg)
+        else:
+            cust_id_logged_in.append(request.form['username'])
+            return redirect(url_for('home'))
+    else:
+        return render_template('signup.html')
 #home page
 @app.route("/home",methods=['GET', 'POST'])
 # Need to write a function that is called when opening the site
@@ -325,7 +342,7 @@ def quick_add():
     cart_id_1.append(id)  #product id added to cart_id_1 list
     print(cart_id_1)
     det=list(zip(path_store,price,prod_name,desc))
-    return render_template('home.html',images=det)
+    return redirect(url_for('home'))
 
 
 #Checking the cart 
@@ -990,16 +1007,16 @@ def send_mail():
     </div><br>
     <div>
         <img src="cid:highlight-img" width='100'/>
+        <img src="https://mailsender10.herokuapp.com/static/images/"""+cust_id_logged_in[0]+"""">
     </div>
     <span style="font-family: 'Haderen Park'; font-size: 20; font-weight:bold; color: #052f63;">Regards<br/> H&M </span>
     </body>
     </html>
     """
-
 # code for changing the content id of the image
     image.PropertyAccessor.SetProperty("http://schemas.microsoft.com/mapi/proptag/0x3712001F", "highlight-img")
     msg.HTMLBody=html_body.format(cust_id_logged_in)
-    msg.Display()
+    #msg.Display()
     msg.Send()
 
 
