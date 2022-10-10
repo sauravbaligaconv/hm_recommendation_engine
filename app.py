@@ -1009,7 +1009,7 @@ def send_mail():
         <img src="cid:highlight-img" width='100'/>
         <img src="https://mailsender10.herokuapp.com/static/images/"""+cust_id_logged_in[0]+"""">
     </div>
-    <span style="font-family: 'Haderen Park'; font-size: 20; font-weight:bold; color: #052f63;">Regards<br/> H&M </span>
+    <span style="font-family: 'Haderen Park'; font-size: 20; font-weight:bold; color: #052f63;">Regards<br/> Your Fashionista </span>
     </body>
     </html>
     """
